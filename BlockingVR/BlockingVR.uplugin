@@ -1,0 +1,25 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "Beta",
+	"FriendlyName": "BlockingVR",
+	"Description": "Basic VR Level Editing Interface",
+	"Category": "Virtual Reality",
+	"CreatedBy": "Opamp",
+	"CreatedByURL": "",
+	"EngineVersion" : "4.9",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"Modules": [
+		{
+			"Name": "BlockingVR",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
+		}
+	],
+	"EnabledByDefault": false,
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false
+}
