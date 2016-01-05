@@ -15,6 +15,9 @@ UPointLightHandleComponent::UPointLightHandleComponent(const FObjectInitializer&
 
 void UPointLightHandleComponent::DrawDebugMeshes(void)
 {
+	//USceneComponent::GetComponentLocation()
+	
+	//T.ToMatrixNoScale()
 	APointLight* Light = Cast<APointLight>(GetOwner());
 	if (Light)
 	{
@@ -22,13 +25,13 @@ void UPointLightHandleComponent::DrawDebugMeshes(void)
 		T.SetLocation(Light->GetActorLocation());
 		float Radius = Cast<UPointLightComponent>(Light->GetLightComponent())->AttenuationRadius;
 		
-		DrawDebugCircle(GetWorld(), T.ToMatrixNoScale(), Radius, 64, FColor(127, 127, 0), false, 0.014, 0);
+		DrawDebugCircle(GetWorld(), T.ToMatrixNoScale(), Radius, 64, FColor(127, 127, 0), false, 0.014, 0, 2, false);
 		FRotator R = FRotator(0, 90, 0);
 		T.SetRotation(R.Quaternion());
-		DrawDebugCircle(GetWorld(), T.ToMatrixNoScale(), Radius, 64, FColor(127, 127, 0), false, 0.014, 0);
+		DrawDebugCircle(GetWorld(), T.ToMatrixNoScale(), Radius, 64, FColor(127, 127, 0), false, 0.014, 0, 2, false);
 		R = FRotator(90, 90, 0);
 		T.SetRotation(R.Quaternion());
-		DrawDebugCircle(GetWorld(), T.ToMatrixNoScale(), Radius, 64, FColor(127, 127, 0), false, 0.014, 0);
+		DrawDebugCircle(GetWorld(), T.ToMatrixNoScale(), Radius, 64, FColor(127, 127, 0), false, 0.014, 0, 2, false);
 	}
 }
 
