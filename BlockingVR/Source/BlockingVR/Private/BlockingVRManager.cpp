@@ -706,10 +706,15 @@ void ABlockingVRManager::SetPIELightDynamicShadows(ALight* Light, bool bDynamicS
 
 void ABlockingVRManager::SetPIELightTranslucentLighting(ALight* Light, bool bTranslucentLighting)
 {
-	Light->GetLightComponent()->bAffectTranslucentLighting = bTranslucentLighting;
-	if (Light->GetRootComponent()->Mobility == EComponentMobility::Static)
-		InvalidateEditorLightingCache(Light);
+	if (!Light) return;
+	if (Light->GetLightComponent()->bAffectTranslucentLighting != bTranslucentLighting)
+	{
+		Light->GetLightComponent()->bAffectTranslucentLighting = bTranslucentLighting;
+		Light->MarkComponentsRenderStateDirty();
+		if (Light->GetRootComponent()->Mobility == EComponentMobility::Static)
+			InvalidateEditorLightingCache(Light);
 		NotifyModifiedLight(Light);
+	}
 }
 
 void  ABlockingVRManager::SetPIEPointLightRadius(APointLight* PointLight, float Radius)
