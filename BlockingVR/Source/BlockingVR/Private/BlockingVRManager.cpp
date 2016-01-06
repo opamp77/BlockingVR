@@ -678,30 +678,41 @@ void ABlockingVRManager::SetPIELightSquareFallOff(ALight* Light, bool bSqrFallof
 	UPointLightComponent* PointLightComponent = Cast<UPointLightComponent>(Light->GetLightComponent());
 	if (PointLightComponent)
 	{
-		EComponentMobility::Type OriginalMobility = Light->GetRootComponent()->Mobility;
-		Light->SetMobility(EComponentMobility::Movable);
-		PointLightComponent->bUseInverseSquaredFalloff = bSqrFalloff;
-		Light->SetMobility(OriginalMobility);
-		if (OriginalMobility == EComponentMobility::Static || EComponentMobility::Stationary)
-			InvalidateEditorLightingCache(Light);
-		NotifyModifiedLight(Light);
+		if (PointLightComponent->bUseInverseSquaredFalloff != bSqrFalloff)
+		{
+			EComponentMobility::Type OriginalMobility = Light->GetRootComponent()->Mobility;
+			Light->SetMobility(EComponentMobility::Movable);
+			PointLightComponent->bUseInverseSquaredFalloff = bSqrFalloff;
+			Light->SetMobility(OriginalMobility);
+			if (OriginalMobility == EComponentMobility::Static || EComponentMobility::Stationary)
+				InvalidateEditorLightingCache(Light);
+			NotifyModifiedLight(Light);
+		}
 	}
 }
 
 void ABlockingVRManager::SetPIELightStaticShadows(ALight* Light, bool bStaticShadows)
 {
-	Light->GetLightComponent()->CastStaticShadows = bStaticShadows;
-	if (Light->GetRootComponent()->Mobility == EComponentMobility::Static || EComponentMobility::Stationary)
-		InvalidateEditorLightingCache(Light);
+	if (!Light) return;
+	if (Light->GetLightComponent()->CastStaticShadows != bStaticShadows)
+	{
+		Light->GetLightComponent()->CastStaticShadows = bStaticShadows;
+		if (Light->GetRootComponent()->Mobility == EComponentMobility::Static || EComponentMobility::Stationary)
+			InvalidateEditorLightingCache(Light);
 
-	NotifyModifiedLight(Light);
+		NotifyModifiedLight(Light);
+	}
 }
 
 void ABlockingVRManager::SetPIELightDynamicShadows(ALight* Light, bool bDynamicShadows)
 {
-	Light->GetLightComponent()->CastDynamicShadows = bDynamicShadows;
-	Light->MarkComponentsRenderStateDirty(); //test
+	if (!Light) return;
+	if (Light->GetLightComponent()->CastDynamicShadows != bDynamicShadows)
+	{
+		Light->GetLightComponent()->CastDynamicShadows = bDynamicShadows;
+		Light->MarkComponentsRenderStateDirty();
 		NotifyModifiedLight(Light);
+	}
 }
 
 void ABlockingVRManager::SetPIELightTranslucentLighting(ALight* Light, bool bTranslucentLighting)
