@@ -15,7 +15,7 @@
 		{
 			"Name": "BlockingVR",
 			"Type": "Editor",
-			"LoadingPhase": "PostEngineInit"
+			"LoadingPhase": "PostDefault"
 		}
 	],
 	"EnabledByDefault": false,

@@ -14,9 +14,12 @@ public class BlockingVR : ModuleRules
                 "Runtime/Engine/Classes/GameFramework",
                  "Runtime/Engine/Classes/Engine",
                  "Runtime/Engine/Classes/Components",
-                 "Runtime/HeadMountedDisplay/Public/",
-                 "Runtime/AssetRegistry/Public/",
-                 "Editor/PropertyEditor/Public"
+                 "Runtime/HeadMountedDisplay/Public",
+                 "Runtime/AssetRegistry/Public",
+                 "Editor/PropertyEditor/Public",
+                 "Editor/ContentBrowser/Public",
+                 "Editor/EditorWidgets/Public",
+                 "Runtime/Engine/Classes/Particles/"
              
                  //"Runtime/Engine/Classes/Kismet/"
 				// ... add public include paths required here ...
@@ -27,6 +30,8 @@ public class BlockingVR : ModuleRules
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				"BlockingVR/Private",
+                "Editor/ContentBrowser/Private",
+                "Editor/EditorWidgets/Private"
 				// ... add other private include paths required here ...
 			}
 			);
@@ -36,6 +41,7 @@ public class BlockingVR : ModuleRules
 			new string[]
 			{
 				"Core",
+                //"PropertyEditor"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -54,7 +60,10 @@ public class BlockingVR : ModuleRules
 				"SlateCore",
                 "HeadMountedDisplay",
                 "AssetRegistry",
-                "PropertyEditor"
+                "PropertyEditor",
+                "EditorWidgets",
+                "CollectionManager"
+                //"ContentBrowser"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

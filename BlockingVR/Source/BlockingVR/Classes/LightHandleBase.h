@@ -6,28 +6,9 @@
 #include "LightHandleBase.generated.h"
 
 UCLASS(meta = (BlueprintSpawnableComponent))
-class ULightHandleBase : public UStaticMeshComponent
+class ULightHandleBase : public UActorHandleBase
 {
 	GENERATED_UCLASS_BODY()
-	
-	virtual void TickComponent
-	(
-	float DeltaTime,
-	enum ELevelTick TickType,
-		FActorComponentTickFunction * ThisTickFunction
-		) override;
-
-public:
-	bool bShouldRender;
-	bool bDrawDebugMeshes;
-	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
-		virtual void DrawDebugMeshes();
-
-private:
-	FVector StartingScale;
-	FRotator CorrectionRotation;
-
-	FVector GetHMDWorldLocation(void);
 
 };
 

@@ -7,7 +7,8 @@
 #include "PointLightHandleComponent.h"
 #include "SpotLightHandleComponent.h"
 #include "DirectionalLightHandleComponent.h"
-#include "SkyLightHandleComponent.h"
+//#include "SkyLightHandleComponent.h"
+#include "ParticleHandleComponent.h"
 
 ABlockingVRManager::ABlockingVRManager(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -16,47 +17,157 @@ ABlockingVRManager::ABlockingVRManager(const FObjectInitializer& ObjectInitializ
 	SetRootComponent(comp);
 }
 
+void ABlockingVRManager::GetCollectionActorClasses(TArray< TSubclassOf<AActor> > &ActorClassesArray)
+{
+	FCollectionManagerModule& CollectionManagerModule = FCollectionManagerModule::GetModule();
+	ICollectionManager& CollectionManager = CollectionManagerModule.Get();
+
+	TArray<FName> ObjectPaths;
+
+	CollectionManager.GetObjectsInCollection(FName("BlockingVRCollection"), ECollectionShareType::CST_Local, ObjectPaths);
+
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+
+	TArray<FAssetData> AssetData;
+	FARFilter Filter;
+	Filter.ObjectPaths = ObjectPaths;
+	AssetRegistryModule.Get().GetAssets(Filter, AssetData);
+
+	for (FAssetData Data : AssetData)
+	{
+		UObject* Object = Data.GetAsset();
+
+		if (Data.GetClass()->IsChildOf(UBlueprint::StaticClass()))
+		{
+			UBlueprint* BluePrint = Cast<UBlueprint>(Object);
+			if (BluePrint)
+			{
+				UClass* GeneratedClass = BluePrint->GeneratedClass;
+				TSubclassOf<AActor> ActorClass = GeneratedClass;
+				if (ActorClass)
+				{
+						ActorClassesArray.Add(ActorClass);
+				}
+			}
+		}
+		else if (Data.GetClass()->IsChildOf(AActor::StaticClass()) )
+		{
+			TSubclassOf<AActor> ActorClass = Object->GetClass();
+			ActorClassesArray.Add(ActorClass);
+		}
+	}
+}
+
+void ABlockingVRManager::GetCollectionStaticMeshes(TArray<UStaticMesh*> &StaticMeshReferenceArray)
+{
+	FCollectionManagerModule& CollectionManagerModule = FCollectionManagerModule::GetModule();
+	ICollectionManager& CollectionManager = CollectionManagerModule.Get();
+
+	TArray<FName> ObjectPaths;
+
+	CollectionManager.GetObjectsInCollection(FName("BlockingVRCollection"), ECollectionShareType::CST_Local, ObjectPaths);
+
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+
+	TArray<FAssetData> AssetData;
+	FARFilter Filter;
+	Filter.ObjectPaths = ObjectPaths;
+	AssetRegistryModule.Get().GetAssets(Filter, AssetData);
+
+	for (FAssetData Data : AssetData)
+	{
+		UObject* Object = Data.GetAsset();
+
+		if (Data.GetClass()->IsChildOf(UStaticMesh::StaticClass()))
+		{
+			UStaticMesh* StaticMesh = Cast<UStaticMesh>(Data.GetAsset());
+			if (StaticMesh)
+			{
+				StaticMeshReferenceArray.Add(StaticMesh);
+			}
+		}
+	}
+}
+
+void ABlockingVRManager::GetCollectionParticles(TArray<UParticleSystem*> &ParticleSystemReferenceArray)
+{
+	FCollectionManagerModule& CollectionManagerModule = FCollectionManagerModule::GetModule();
+	ICollectionManager& CollectionManager = CollectionManagerModule.Get();
+
+	TArray<FName> ObjectPaths;
+
+	CollectionManager.GetObjectsInCollection(FName("BlockingVRCollection"), ECollectionShareType::CST_Local, ObjectPaths);
+
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+
+	TArray<FAssetData> AssetData;
+	FARFilter Filter;
+	Filter.ObjectPaths = ObjectPaths;
+	AssetRegistryModule.Get().GetAssets(Filter, AssetData);
+
+	for (FAssetData Data : AssetData)
+	{
+		UObject* Object = Data.GetAsset();
+
+		if (Data.GetClass()->IsChildOf(UParticleSystem::StaticClass()))
+		{
+			UParticleSystem* ParticleSystem = Cast<UParticleSystem>(Data.GetAsset());
+			if (ParticleSystem)
+			{
+				ParticleSystemReferenceArray.Add(ParticleSystem);
+			}
+		}
+	}
+}
+
+void ABlockingVRManager::GetCollectionSkeletalMeshes(TArray<USkeletalMesh*> &SkeletalMeshReferenceArray)
+{
+	FCollectionManagerModule& CollectionManagerModule = FCollectionManagerModule::GetModule();
+	ICollectionManager& CollectionManager = CollectionManagerModule.Get();
+
+	TArray<FName> ObjectPaths;
+
+	CollectionManager.GetObjectsInCollection(FName("BlockingVRCollection"), ECollectionShareType::CST_Local, ObjectPaths);
+
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+
+	TArray<FAssetData> AssetData;
+	FARFilter Filter;
+	Filter.ObjectPaths = ObjectPaths;
+	AssetRegistryModule.Get().GetAssets(Filter, AssetData);
+
+	for (FAssetData Data : AssetData)
+	{
+		UObject* Object = Data.GetAsset();
+
+		if (Data.GetClass()->IsChildOf(USkeletalMesh::StaticClass()))
+		{
+			USkeletalMesh* SkeletalMesh = Cast<USkeletalMesh>(Data.GetAsset());
+			if (SkeletalMesh)
+			{
+				SkeletalMeshReferenceArray.Add(SkeletalMesh);
+			}
+		}
+	}
+}
+
 void ABlockingVRManager::BeginPlay(void)
 {
 	Super::BeginPlay();
 	//Attach PointLight Handles
 	for (TActorIterator<APointLight> ActorItr(GetWorld()); ActorItr; ++ActorItr) 
 	{
-		UPointLightHandleComponent* pComponent = NewObject<UPointLightHandleComponent>(*ActorItr, FName("LightHandleComponent"));
-		if (pComponent)
-		{
-			pComponent->AttachTo(ActorItr->GetRootComponent(), NAME_None, EAttachLocation::SnapToTarget, false);
-			pComponent->RegisterComponentWithWorld(GetWorld());
-			ActorItr->SetActorHiddenInGame(false);
-			pComponent->SetHiddenInGame(false);
-			pComponent->SetVisibility(true);
-		}
+		AttachHandle(*ActorItr,EBVRHandleType::BVR_PointLightHandle);
 	}
 	//Attach SpotLight Handles
 	for (TActorIterator<ASpotLight> ActorItr(GetWorld()); ActorItr; ++ActorItr) 
 	{
-		USpotLightHandleComponent* pComponent = NewObject<USpotLightHandleComponent>(*ActorItr, FName("LightHandleComponent"));
-		if (pComponent)
-		{
-			pComponent->AttachTo(ActorItr->GetRootComponent(), NAME_None, EAttachLocation::SnapToTarget, false);
-			pComponent->RegisterComponentWithWorld(GetWorld());
-			ActorItr->SetActorHiddenInGame(false);
-			pComponent->SetHiddenInGame(false);
-			pComponent->SetVisibility(true);
-		}
+		AttachHandle(*ActorItr, EBVRHandleType::BVR_SpotLightHandle);
 	}
 	//Attach DirectionalLight Handles
 	for (TActorIterator<ADirectionalLight> ActorItr(GetWorld()); ActorItr; ++ActorItr) 
 	{
-		UDirectionalLightHandleComponent* pComponent = NewObject<UDirectionalLightHandleComponent>(*ActorItr, FName("LightHandleComponent"));
-		if (pComponent)
-		{
-			pComponent->AttachTo(ActorItr->GetRootComponent(), NAME_None, EAttachLocation::SnapToTarget, false);
-			pComponent->RegisterComponentWithWorld(GetWorld());
-			ActorItr->SetActorHiddenInGame(false);
-			pComponent->SetHiddenInGame(false);
-			pComponent->SetVisibility(true);
-		}
+		AttachHandle(*ActorItr, EBVRHandleType::BVR_DirectionalLightHandle);
 	}
 	//Attach SkyLight Handles
 	/*for (TActorIterator<ASkyLight> ActorItr(GetWorld()); ActorItr; ++ActorItr) 
@@ -71,6 +182,11 @@ void ABlockingVRManager::BeginPlay(void)
 			pComponent->SetVisibility(true);
 		}
 	}*/
+	//Attach Particle Handles
+	for (TActorIterator<AEmitter> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		AttachHandle(*ActorItr, EBVRHandleType::BVR_ParticleHandle);
+	}
 }
 
 UTexture2D* ABlockingVRManager::CreateActorThumbnailTexture(TSubclassOf<AActor> ActorIN)
@@ -123,7 +239,6 @@ UTexture2D* ABlockingVRManager::CreateParticleThumbnailTexture(class UParticleSy
 
 UTexture2D* ABlockingVRManager::CreateThumbnailTexture(FName PackageName ,FName ObjectPath) //private
 {
-	//TODO: NEED TO CREATE THUMBNAIL IF PACKAGE HAS YET TO BE SAVED...
 	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
 	TArray<FAssetData> AssetData;
 	
@@ -144,7 +259,8 @@ UTexture2D* ABlockingVRManager::CreateThumbnailTexture(FName PackageName ,FName 
 			FThumbnailMap ThumbnailMap;
 			TSet<FName> ObjectFullNames;
 			ObjectFullNames.Add(FName(*AssetData[0].GetFullName()));
-			ThumbnailTools::LoadThumbnailsFromPackage(PackageFilename, ObjectFullNames, ThumbnailMap);
+			ThumbnailTools::ConditionallyLoadThumbnailsFromPackage(PackageFilename, ObjectFullNames, ThumbnailMap);
+
 			const FObjectThumbnail* ThumbnailPtr = ThumbnailMap.Find(FName(*AssetData[0].GetFullName()));
 			if (ThumbnailPtr)
 			{
@@ -160,17 +276,37 @@ UTexture2D* ABlockingVRManager::CreateThumbnailTexture(FName PackageName ,FName 
 					Texture->UpdateResource();
 				}
 				return Texture;
+			} //end if thumbnail
+		} //end if package
+			//Create New Thumbnail
+		else
+		{
+			FObjectThumbnail* NewThumbNail = ThumbnailTools::GenerateThumbnailForObjectToSaveToDisk(AssetData[0].GetAsset());
+			if (NewThumbNail)
+			{
+					TArray<uint8> Data = NewThumbNail->GetUncompressedImageData();
+				UTexture2D* Texture = nullptr;
+				Texture = UTexture2D::CreateTransient(NewThumbNail->GetImageWidth(), NewThumbNail->GetImageHeight());
+				if (Texture)
+				{
+					FTexture2DMipMap& Mip = Texture->PlatformData->Mips[0];
+					void* MipData = Mip.BulkData.Lock(LOCK_READ_WRITE);
+					FMemory::Memcpy(MipData, &Data[0], Data.Num());
+					Mip.BulkData.Unlock();
+					Texture->UpdateResource();
+				}
+				return Texture;
 			}
 			else return nullptr;
 		}
-		else return nullptr;
+		return nullptr;
 	}
 	else return nullptr;
 }
 
 void ABlockingVRManager::ApplyDeferredChanges(void)
 {
-	//Do deleted Editor Actors(Including lights)
+	//Do deleted Editor Actors(Including lights and particles)
 	for (AActor* EditorActor : DeletedEditorActors)
 	{
 		GEditor->GetEditorWorldContext().World()->DestroyActor(EditorActor);
@@ -181,15 +317,16 @@ void ABlockingVRManager::ApplyDeferredChanges(void)
 	for (const ALight* PIELight : NewEditorLights)
 	{
 		//PointLight
-		if ((uint8)PIELight->GetLightComponent()->GetLightType() == (uint8)EBVRLightType::VBR_PointLight)
+		if (!PIELight->IsValidLowLevel()) UE_LOG(BlockingVR_Log, Error, TEXT("BLockingVRManager::ApplyDeferredChanges() A PIELight within NewEditorLights is no Longer valid!!!! 320"));
+		if ((uint8)PIELight->GetLightComponent()->GetLightType() == (uint8)EBVRLightType::BVR_PointLight)
 		{
 			//add the editor Light
-			APointLight* EditorPointLight = Cast<APointLight>(AddEditorLight(PIELight->GetTransform(), EBVRLightType::VBR_PointLight));
+			APointLight* EditorPointLight = Cast<APointLight>(AddEditorLight(PIELight->GetTransform(), EBVRLightType::BVR_PointLight));
 			if (EditorPointLight)
 			{
 				//needs to be set to movable temporarily to be able to apply certian properties such as radius/cone angles
 				EditorPointLight->SetMobility(EComponentMobility::Movable);
-				SetCommonEditorLightProperties(EditorPointLight, PIELight); //common properties
+				CopyCommonLightProperties(EditorPointLight, PIELight); //common properties
 				EditorPointLight->SetRadius(Cast<UPointLightComponent>(PIELight->GetLightComponent())->AttenuationRadius); //radius
 				EditorPointLight->GetLightComponent()->SetIESTexture(PIELight->GetLightComponent()->IESTexture); //IES
 				EditorPointLight->GetLightComponent()->bUseIESBrightness = PIELight->GetLightComponent()->bUseIESBrightness;
@@ -198,14 +335,14 @@ void ABlockingVRManager::ApplyDeferredChanges(void)
 			}
 		}
 		//SpotLight
-		else if ((uint8)PIELight->GetLightComponent()->GetLightType() == (uint8)EBVRLightType::VBR_SpotLight)
+		else if ((uint8)PIELight->GetLightComponent()->GetLightType() == (uint8)EBVRLightType::BVR_SpotLight)
 		{
-			ASpotLight* EditorSpotLight = Cast<ASpotLight>(AddEditorLight(PIELight->GetTransform(), EBVRLightType::VBR_SpotLight));
+			ASpotLight* EditorSpotLight = Cast<ASpotLight>(AddEditorLight(PIELight->GetTransform(), EBVRLightType::BVR_SpotLight));
 			if (EditorSpotLight)
 			{
 				//needs to be set to movable temporarily to be able to apply certain properties such as radius/cone angles
 				EditorSpotLight->SetMobility(EComponentMobility::Movable);
-				SetCommonEditorLightProperties(EditorSpotLight, PIELight); //common Properties
+				CopyCommonLightProperties(EditorSpotLight, PIELight); //common Properties
 				
 				USpotLightComponent* EditorSpotLightComponent = Cast<USpotLightComponent>(EditorSpotLight->GetLightComponent());
 				USpotLightComponent* PIESpotLightComponent = Cast<USpotLightComponent>(PIELight->GetLightComponent());
@@ -221,18 +358,20 @@ void ABlockingVRManager::ApplyDeferredChanges(void)
 			}
 		}
 		//DirectionalLight...
-		else if ((uint8)PIELight->GetLightComponent()->GetLightType() == (uint8)EBVRLightType::VBR_DirectionalLight)
+		else if ((uint8)PIELight->GetLightComponent()->GetLightType() == (uint8)EBVRLightType::BVR_DirectionalLight)
 		{
-			ADirectionalLight* EditorDirectionalLight = Cast<ADirectionalLight>(AddEditorLight(PIELight->GetTransform(), EBVRLightType::VBR_DirectionalLight));
+			ADirectionalLight* EditorDirectionalLight = Cast<ADirectionalLight>(AddEditorLight(PIELight->GetTransform(), EBVRLightType::BVR_DirectionalLight));
 			if (EditorDirectionalLight)
 			{
-				SetCommonEditorLightProperties(EditorDirectionalLight, PIELight);
+				CopyCommonLightProperties(EditorDirectionalLight, PIELight);
 			}
 		}
 	}
 	//Do to be Modified Editor Lights
 	for (const ALight* PIELight : ModifiedEditorLights)
 	{
+		if (!PIELight->IsValidLowLevel()) UE_LOG(BlockingVR_Log, Error, TEXT("BLockingVRManager::ApplyDeferredChanges() A PIELight within ModifiedEditorLights is no Longer valid!!!! 373"));
+
 		//find editor version and apply properties
 		//TODO CHECK ALL SUBLEVELS FOR ACTOR
 		if (GEditor->ObjectsThatExistInEditorWorld.Get(PIELight))
@@ -245,9 +384,10 @@ void ABlockingVRManager::ApplyDeferredChanges(void)
 				EditorLight->SetMobility(EComponentMobility::Movable);
 
 				//common poroperties of all lights
-				SetCommonEditorLightProperties(EditorLight, PIELight);
+				CopyCommonLightProperties(EditorLight, PIELight);
 				//pointlights
-				if ((uint8)PIELight->GetLightComponent()->GetLightType() == (uint8)EBVRLightType::VBR_PointLight)
+				if (!PIELight->IsValidLowLevel()) UE_LOG(BlockingVR_Log, Error, TEXT("BLockingVRManager::ApplyDeferredChanges() PIELight No Loger Valid!!!! 389"));
+				if ((uint8)PIELight->GetLightComponent()->GetLightType() ==(uint8)EBVRLightType::BVR_PointLight)
 				{
 					APointLight* EditorPointLight = Cast<APointLight>(EditorLight);
 					const APointLight* PIEPointLight = Cast<APointLight>(PIELight);
@@ -258,7 +398,7 @@ void ABlockingVRManager::ApplyDeferredChanges(void)
 				
 				}
 				//spotlights
-				else if ((uint8)PIELight->GetLightComponent()->GetLightType() == (uint8)EBVRLightType::VBR_SpotLight)
+				else if ((uint8)PIELight->GetLightComponent()->GetLightType() == (uint8)EBVRLightType::BVR_SpotLight)
 				{
 					ASpotLight* EditorSpotLight = Cast<ASpotLight>(EditorLight);
 					const ASpotLight* PIESpotLight = Cast<ASpotLight>(PIELight);
@@ -271,9 +411,9 @@ void ABlockingVRManager::ApplyDeferredChanges(void)
 					EditorSpotLightComponent->SetInnerConeAngle(PIESpotLightComponent->InnerConeAngle); //inner
 				}
 				//Directional Lights
-				else if ((uint8)PIELight->GetLightComponent()->GetLightType() == (uint8)EBVRLightType::VBR_DirectionalLight)
+				else if ((uint8)PIELight->GetLightComponent()->GetLightType() == (uint8)EBVRLightType::BVR_DirectionalLight)
 				{
-					//COVERED BY SetCommonEditorLightProperties();
+					//COVERED BY CopyCommonLightProperties();
 				}
 				//TODO MODIFIED SKYLIGHTS...
 
@@ -286,9 +426,11 @@ void ABlockingVRManager::ApplyDeferredChanges(void)
 	//Do add new editor Actors
 	for (AActor* PIEActor : NewEditorActors)
 	{
+		if (!PIEActor->IsValidLowLevel()) UE_LOG(BlockingVR_Log, Error, TEXT("BLockingVRManager::ApplyDeferredChanges() PIEActor No Loger Valid!!!! 429"));
+
 		AddEditorActor(PIEActor->GetTransform(), PIEActor);
 	}
-	//Do to be modified Editor Actors
+	//Do to be modified Editor Actors(including particles)
 	for (const AActor* PIEActor : ModifiedEditorActors)
 	{
 		if (GEditor->ObjectsThatExistInEditorWorld.Get(PIEActor))
@@ -299,14 +441,21 @@ void ABlockingVRManager::ApplyDeferredChanges(void)
 			if (EditorActor)
 			{
 				EditorActor->SetActorTransform(PIEActor->GetTransform());
+				EditorActor->MarkComponentsRenderStateDirty();
 			}
 		}
+	}
+	//Do NewEditorParticles
+	for (AEmitter* PIEEmitter : NewEditorParticles)
+	{
+		AddEditorParticle(PIEEmitter->GetTransform(), PIEEmitter);
 	}
 	DeletedEditorActors.Empty();
 	NewEditorActors.Empty();
 	NewEditorLights.Empty();
 	ModifiedEditorActors.Empty();
 	ModifiedEditorLights.Empty();
+	NewEditorParticles.Empty();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -328,6 +477,28 @@ bool ABlockingVRManager::PIESetStaticMesh(UStaticMeshComponent* StaticMeshCompon
 		}
 	}
 	return result;
+}
+
+AEmitter* ABlockingVRManager::AddPIEParticle(UParticleSystem* Template, FTransform T)
+{
+	if (!Template) return nullptr;
+
+	AEmitter* PIEEmitter = nullptr;
+	AActor* PIEActor = nullptr;
+	FVector L = T.GetLocation();
+
+	PIEActor = GetWorld()->SpawnActor(AEmitter::StaticClass(), &L);
+	if (PIEActor) PIEEmitter = Cast<AEmitter>(PIEActor);
+
+	if (PIEEmitter)
+	{
+		AttachHandle(PIEEmitter, EBVRHandleType::BVR_ParticleHandle);
+		PIEEmitter->SetActorTransform(T, false, nullptr, ETeleportType::TeleportPhysics);
+		PIEEmitter->GetParticleSystemComponent()->SetTemplate(Template);
+		//Currently the editor world additions are deffered until ApllyDeferredChanges()
+		NewEditorParticles.Add(PIEEmitter);
+	}
+	return PIEEmitter;
 }
 
 AActor* ABlockingVRManager::AddPIEActor(TSubclassOf<class AActor> Actor, FTransform T)
@@ -385,6 +556,11 @@ void ABlockingVRManager::PastePIEActor(AActor* Actor, FVector Location)
 				Cast<AStaticMeshActor>(PIEActor)->GetStaticMeshComponent()->SetMaterial(i, MeshMaterials[i]);
 			}
 		}
+	}
+	//Particle Emitter Actor
+	else if (Actor->IsA(AEmitter::StaticClass()))
+	{
+		PastePIEParticle(Cast<AEmitter>(Actor), Location);
 	}
 	//Other Actor
 	else 
@@ -468,7 +644,7 @@ void ABlockingVRManager::SetLocationPIEActor(AActor* Actor, FVector Location, bo
 	ALight* Light = Cast<ALight>(Actor);
 	if (Light)
 	{
-		if (OriginalMobility == EComponentMobility::Static || EComponentMobility::Stationary)
+		if ( (OriginalMobility == EComponentMobility::Static || EComponentMobility::Stationary) && !Light->IsA(ADirectionalLight::StaticClass()) )
 			InvalidateEditorLightingCache(Light);
 		NotifyModifiedLight(Light);
 		return;
@@ -481,7 +657,7 @@ void ABlockingVRManager::SetLocationPIEActor(AActor* Actor, FVector Location, bo
 	}
 }
 
-void ABlockingVRManager::SetRotationPIEActor(AActor* Actor, FRotator Rotation, bool Snap, bool UseEditorSnapSize, float SnapSize)
+void ABlockingVRManager::SetRotationPIEActor(AActor* Actor, FRotator Rotation, bool Relative, bool Snap, bool UseEditorSnapSize, float SnapSize)
 {
 	if (!Actor || !IsAllowedClass(Actor)) return;
 	if (Snap)
@@ -503,7 +679,11 @@ void ABlockingVRManager::SetRotationPIEActor(AActor* Actor, FRotator Rotation, b
 	}
 	EComponentMobility::Type OriginalMobility = Actor->GetRootComponent()->Mobility;
 	Actor->GetRootComponent()->SetMobility(EComponentMobility::Movable);
-	Actor->SetActorRotation(Rotation);
+	if (Relative)
+		Actor->SetActorRotation(Rotation);
+	else
+		Actor->SetActorRelativeRotation(Rotation);
+
 	Actor->GetRootComponent()->SetMobility(OriginalMobility);
 	for (int32 i = 0; i < ComponentList.Num(); i++)
 	{
@@ -596,6 +776,14 @@ void ABlockingVRManager::DeletePIEActor(AActor* Actor)
 	} //end for
 	if (bIsNewActor == false)
 	{
+		for (int32 i = 0; i < ModifiedEditorActors.Num(); i++) //remove from modiefied list if in there
+		{
+			if (ModifiedEditorActors[i] == Actor) //fixes previous crash bug
+			{
+				ModifiedEditorActors.RemoveAt(i);
+				break;
+			}
+		}
 		//try and find the editor version for destruction then destroy the PIE verson
 		DeleteEditorActor(Actor);
 		Actor->Destroy();
@@ -606,16 +794,16 @@ ALight* ABlockingVRManager::AddPIELight(FVector Location, EBVRLightType LightTyp
 {
 	ALight* PIELight = nullptr;
 
-	if (LightType == EBVRLightType::VBR_PointLight)
+	if (LightType == EBVRLightType::BVR_PointLight)
 	{
 		PIELight = Cast<ALight>(GetWorld()->SpawnActor(APointLight::StaticClass(), &Location));
 	}
-	else if (LightType == EBVRLightType::VBR_SpotLight)
+	else if (LightType == EBVRLightType::BVR_SpotLight)
 	{
 		AActor* A = GetWorld()->SpawnActor(ASpotLight::StaticClass(), &Location);
 		PIELight = Cast<ALight>(A);
 	}
-	else if (LightType == EBVRLightType::VBR_DirectionalLight)
+	else if (LightType == EBVRLightType::BVR_DirectionalLight)
 	{
 		AActor* A = GetWorld()->SpawnActor(ADirectionalLight::StaticClass(), &Location);
 		PIELight = Cast<ALight>(A);
@@ -623,22 +811,14 @@ ALight* ABlockingVRManager::AddPIELight(FVector Location, EBVRLightType LightTyp
 	if (PIELight)
 	{
 		//add handle
-		ULightHandleBase* pComponent = nullptr;
-		if (LightType == EBVRLightType::VBR_PointLight)
-			pComponent = NewObject<UPointLightHandleComponent>(PIELight, FName("LightHandleComponent"));
-		else if (LightType == EBVRLightType::VBR_SpotLight)
-			pComponent = NewObject<USpotLightHandleComponent>(PIELight, FName("LightHandleComponent"));
-		else if (LightType == EBVRLightType::VBR_DirectionalLight)
-			pComponent = NewObject<UDirectionalLightHandleComponent>(PIELight, FName("LightHandleComponent"));
+		if (LightType == EBVRLightType::BVR_PointLight)
+			AttachHandle(PIELight, EBVRHandleType::BVR_PointLightHandle);
+		else if (LightType == EBVRLightType::BVR_SpotLight)
+			AttachHandle(PIELight, EBVRHandleType::BVR_SpotLightHandle);
+		else if (LightType == EBVRLightType::BVR_DirectionalLight)
+			AttachHandle(PIELight, EBVRHandleType::BVR_DirectionalLightHandle);
+
 		
-		if (pComponent)
-		{
-			pComponent->AttachTo(PIELight->GetRootComponent(), NAME_None, EAttachLocation::SnapToTarget, false);
-			pComponent->RegisterComponentWithWorld(GetWorld());
-			PIELight->SetActorHiddenInGame(false);
-			pComponent->SetHiddenInGame(false);
-			pComponent->SetVisibility(true);
-		}
 		PIELight->SetMobility(EComponentMobility::Movable);
 		NewEditorLights.Add(PIELight); //add to deffered array
 	}
@@ -812,7 +992,19 @@ void ABlockingVRManager::SetPIELightHandleVisibility(ALight* Light, bool bVisibl
 	}
 }
 
-void ABlockingVRManager::HideAllPIELightHandles()
+void ABlockingVRManager::ShowAllPIEHandles(void)
+{
+	ShowAllPIELightHandles();
+	ShowAllPIEParticleHandles();
+}
+
+void ABlockingVRManager::HideAllPIEHandles(void)
+{
+	HideAllPIELightHandles();
+	HideAllPIEParticleHandles();
+}
+
+void ABlockingVRManager::HideAllPIELightHandles(void)
 {
 	for (TActorIterator<ALight> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -820,13 +1012,46 @@ void ABlockingVRManager::HideAllPIELightHandles()
 	}
 }
 
-void ABlockingVRManager::ShowAllPIELightHandles()
+void ABlockingVRManager::ShowAllPIELightHandles(void)
 {
 	for (TActorIterator<ALight> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 		SetPIELightHandleVisibility(*ActorItr, true);
 	}
 	
+}
+
+void ABlockingVRManager::SetPIEParticleHandleVisibility(AEmitter* Emitter, bool bVisible)
+{
+	if (!Emitter) return;
+	TArray<UActorComponent*> ComponentList = Emitter->GetComponents();
+	for (UActorComponent* Component : ComponentList)
+	{
+		UParticleHandleComponent* ParticleHandle = Cast<UParticleHandleComponent>(Component);
+		if (ParticleHandle)
+		{
+			ParticleHandle->bShouldRender = bVisible;
+			ParticleHandle->SetVisibility(bVisible);
+			ParticleHandle->SetCollisionEnabled((ECollisionEnabled::Type)bVisible);
+			break;
+		}
+	}
+}
+
+void ABlockingVRManager::ShowAllPIEParticleHandles(void)
+{
+	for (TActorIterator<AEmitter> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		SetPIEParticleHandleVisibility(*ActorItr, true);
+	}
+}
+
+void ABlockingVRManager::HideAllPIEParticleHandles(void)
+{
+	for (TActorIterator<AEmitter> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		SetPIEParticleHandleVisibility(*ActorItr, false);
+	}
 }
 
 void ABlockingVRManager::SetPIELightDebugMeshVisibility(ALight* Light, bool bVisible)
@@ -868,7 +1093,7 @@ void ABlockingVRManager::SetPIELightDebugMeshVisibility(ALight* Light, bool bVis
 
 }
 
-void ABlockingVRManager::HideAllPIELightDebugMeshes()
+void ABlockingVRManager::HideAllPIELightDebugMeshes(void)
 {
 	for (TActorIterator<ALight> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -876,7 +1101,7 @@ void ABlockingVRManager::HideAllPIELightDebugMeshes()
 	}
 }
 
-void ABlockingVRManager::ShowAllPIELightDebugMeshes()
+void ABlockingVRManager::ShowAllPIELightDebugMeshes(void)
 {
 	for (TActorIterator<ALight> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -884,13 +1109,38 @@ void ABlockingVRManager::ShowAllPIELightDebugMeshes()
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////
+void ABlockingVRManager::AddEditorParticle(FTransform T, AEmitter* Emitter)
+{
+	if (!Emitter)
+	{
+		UE_LOG(BlockingVR_Log, Error, TEXT("ABlockingVRManager::AddEditorParticle() Emitter = nullptr"));
+		return;
+	}
+
+	if (GEditor && GEditor->GetEditorWorldContext().World() && GEditor->GetEditorWorldContext().World()->GetCurrentLevel())
+	{
+		AActor* EditorActor = GEditor->AddActor(GEditor->GetEditorWorldContext().World()->GetCurrentLevel(), Emitter->GetClass(), T);
+		if (EditorActor)
+		{
+			AEmitter* EditorEmitter = Cast<AEmitter>(EditorActor);
+			EditorEmitter->GetParticleSystemComponent()->SetTemplate(Emitter->GetParticleSystemComponent()->Template);
+		}
+		else UE_LOG(BlockingVR_Log, Error, TEXT("ABlockingVRManager::AddEditorParticle() Failed!"));
+	}
+}
+
 void ABlockingVRManager::AddEditorActor(FTransform T, AActor* Actor) //private
 {
-	if (!Actor) return;
+	if (!Actor)
+	{
+		UE_LOG(BlockingVR_Log, Error, TEXT("ABlockingVRManager::AddEditorActor() Actor = nullptr"));
+		return;
+	}
 
 	if (GEditor && GEditor->GetEditorWorldContext().World() && GEditor->GetEditorWorldContext().World()->GetCurrentLevel())
 	{
 		AActor* EditorActor = GEditor->AddActor(GEditor->GetEditorWorldContext().World()->GetCurrentLevel(), Actor->GetClass(), T);
+		if (!EditorActor) UE_LOG(BlockingVR_Log, Error, TEXT("ABlockingVRManager::AddEditorActor() Faild!"));
 		if (EditorActor && Actor->GetClass() == AStaticMeshActor::StaticClass())
 		{
 			EComponentMobility::Type OriginalMobility = Actor->GetRootComponent()->Mobility;
@@ -910,7 +1160,12 @@ void ABlockingVRManager::AddEditorActor(FTransform T, AActor* Actor) //private
 
 void ABlockingVRManager::DeleteEditorActor(AActor* Actor) //private
 {
-	if (!Actor) return;
+	if (!Actor)
+	{
+		UE_LOG(BlockingVR_Log, Error, TEXT("ABlockingVRManager::DeleteEditorActor() Actor = nullptr"));
+		return;
+	}
+
 	if (GEditor->ObjectsThatExistInEditorWorld.Get(Actor))
 	{
 		const bool bExactClass = false;
@@ -931,25 +1186,24 @@ ALight* ABlockingVRManager::AddEditorLight(FTransform T, EBVRLightType LightType
 	{
 		AActor* EditorLight = nullptr;
 
-		if (LightType == EBVRLightType::VBR_PointLight)
+		if (LightType == EBVRLightType::BVR_PointLight)
 		{
 			EditorLight = GEditor->AddActor(GEditor->GetEditorWorldContext().World()->GetCurrentLevel(), APointLight::StaticClass(), T);
 		}
-		else if (LightType == EBVRLightType::VBR_SpotLight)
+		else if (LightType == EBVRLightType::BVR_SpotLight)
 		{
 			EditorLight = GEditor->AddActor(GEditor->GetEditorWorldContext().World()->GetCurrentLevel(), ASpotLight::StaticClass(), T);
 		}
-		else if (LightType == EBVRLightType::VBR_DirectionalLight)
+		else if (LightType == EBVRLightType::BVR_DirectionalLight)
 		{
 			EditorLight = GEditor->AddActor(GEditor->GetEditorWorldContext().World()->GetCurrentLevel(), ADirectionalLight::StaticClass(), T);
 		}
 		if (EditorLight)
 		{
-			//EditorLight->MarkComponentsRenderStateDirty();
 			Result = Cast<ALight>(EditorLight);
 		}
 	} //end if geditor
-
+	if (!Result) UE_LOG(BlockingVR_Log, Error, TEXT("ABlockingVRManager::AddEditorLight() Failed!"));
 	return Result;
 
 }
@@ -971,6 +1225,14 @@ void ABlockingVRManager::DeletePIELight(ALight* Light) //private
 	{
 		if (Light->GetRootComponent()->Mobility == EComponentMobility::Static)
 			InvalidateEditorLightingCache(Light);
+		for (int32 i = 0; i < ModifiedEditorLights.Num(); i++) //remove from modiefied list if in there
+		{
+			if (ModifiedEditorLights[i] == Light) //fixes previous crash bug
+			{
+				ModifiedEditorLights.RemoveAt(i);
+				break;
+			}
+		}
 		//try and find the editor version for destruction then destroy the PIE verson
 		DeleteEditorActor(Light);
 	}
@@ -997,22 +1259,25 @@ void ABlockingVRManager::PastePIELight(ALight* Light, FVector Location) //privat
 	}*/
 }
 
-void ABlockingVRManager::SetCommonEditorLightProperties(ALight* EditorLight, const ALight* PIELight) //private
+void ABlockingVRManager::CopyCommonLightProperties(ALight* ToLight, const ALight* FromLight) //private
 {
-	EditorLight->SetActorTransform(PIELight->GetTransform());
-	EditorLight->SetLightColor(PIELight->GetLightColor());
-	EditorLight->GetLightComponent()->SetIntensity(PIELight->GetLightComponent()->Intensity);
-	EditorLight->GetLightComponent()->CastStaticShadows = PIELight->GetLightComponent()->CastStaticShadows;
-	EditorLight->GetLightComponent()->CastDynamicShadows = PIELight->GetLightComponent()->CastDynamicShadows;
-	EditorLight->GetLightComponent()->bAffectTranslucentLighting = PIELight->GetLightComponent()->bAffectTranslucentLighting;
+	ToLight->SetActorTransform(FromLight->GetTransform());
+	ToLight->SetLightColor(FromLight->GetLightColor());
+	ToLight->GetLightComponent()->SetIntensity(FromLight->GetLightComponent()->Intensity);
+	ToLight->GetLightComponent()->CastStaticShadows = FromLight->GetLightComponent()->CastStaticShadows;
+	ToLight->GetLightComponent()->CastDynamicShadows = FromLight->GetLightComponent()->CastDynamicShadows;
+	ToLight->GetLightComponent()->bAffectTranslucentLighting = FromLight->GetLightComponent()->bAffectTranslucentLighting;
+	ToLight->GetLightComponent()->CastTranslucentShadows = FromLight->GetLightComponent()->CastTranslucentShadows;
 }
 
 void ABlockingVRManager::PastePIEPointLight(APointLight* PointLight, FVector Location) //private
 {
 	if (!PointLight) return;
-	APointLight* PIELight = Cast<APointLight>(AddPIELight(Location, EBVRLightType::VBR_PointLight));
+	APointLight* PIELight = Cast<APointLight>(AddPIELight(Location, EBVRLightType::BVR_PointLight));
 	if (PIELight)
 	{
+		CopyCommonLightProperties(PIELight, PointLight);
+		PIELight->SetActorLocation(Location);
 		PIELight->SetActorRotation(PointLight->GetActorRotation()); //rotation
 		PIELight->SetLightColor(PointLight->GetLightColor()); //color
 		PIELight->GetLightComponent()->SetIntensity(PointLight->GetLightComponent()->Intensity); //intensity
@@ -1026,9 +1291,11 @@ void ABlockingVRManager::PastePIEPointLight(APointLight* PointLight, FVector Loc
 void ABlockingVRManager::PastePIESpotLight(ASpotLight* SpotLight, FVector Location) //private
 {
 	if (!SpotLight) return;
-	ASpotLight* PIELight = Cast<ASpotLight>(AddPIELight(Location, EBVRLightType::VBR_SpotLight));
+	ASpotLight* PIELight = Cast<ASpotLight>(AddPIELight(Location, EBVRLightType::BVR_SpotLight));
 	if (PIELight)
 	{
+		CopyCommonLightProperties(PIELight, SpotLight);
+		PIELight->SetActorLocation(Location);
 		PIELight->SetActorRotation(SpotLight->GetActorRotation()); //rotation
 		PIELight->SetLightColor(SpotLight->GetLightColor()); //color
 		PIELight->GetLightComponent()->SetIntensity(SpotLight->GetLightComponent()->Intensity); //intensity
@@ -1050,9 +1317,11 @@ void ABlockingVRManager::PastePIESpotLight(ASpotLight* SpotLight, FVector Locati
 void ABlockingVRManager::PastePIEDirectionalLight(ADirectionalLight* DirectionalLight, FVector Location) //private
 {
 	if (!DirectionalLight) return;
-	ADirectionalLight* PIELight = Cast<ADirectionalLight>(AddPIELight(Location, EBVRLightType::VBR_DirectionalLight));
+	ADirectionalLight* PIELight = Cast<ADirectionalLight>(AddPIELight(Location, EBVRLightType::BVR_DirectionalLight));
 	if (PIELight)
 	{
+		CopyCommonLightProperties(PIELight, DirectionalLight);
+		PIELight->SetActorLocation(Location);
 		PIELight->SetActorRotation(DirectionalLight->GetActorRotation()); //rotation
 		PIELight->SetLightColor(DirectionalLight->GetLightColor()); //color
 		PIELight->GetLightComponent()->SetIntensity(DirectionalLight->GetLightComponent()->Intensity); //intensity
@@ -1145,11 +1414,52 @@ bool ABlockingVRManager::IsAllowedClass(AActor* Actor)
 	//return IsAllowedClass(Actor->GetClass());
 }
 
-bool ABlockingVRManager::IsAllowedClass(TSubclassOf<class AActor> ClassIN) //TODO: Need Class version of isa()!?!
+bool ABlockingVRManager::IsAllowedClass(TSubclassOf<class AActor> ClassIN)
 {
-	if (ClassIN == ASkyLight::StaticClass() || ClassIN == ABlockingVolume::StaticClass() || ClassIN == ABrush::StaticClass() )
+
+	if (ClassIN->IsChildOf(ASkyLight::StaticClass()) || ClassIN->IsChildOf(ABlockingVolume::StaticClass()) || ClassIN->IsChildOf(ABrush::StaticClass()) )
 		return false;
-	else return true;
+	if (ClassIN->IsChildOf(AActor::StaticClass())) return true;
+	else return false;
+}
+
+void ABlockingVRManager::AttachHandle(AActor* Actor, EBVRHandleType HandleType)
+{
+	UActorHandleBase* pComponent = nullptr;
+	if (HandleType == EBVRHandleType::BVR_PointLightHandle)
+		pComponent = NewObject<UPointLightHandleComponent>(Actor, FName("LightHandleComponent"));
+	else if (HandleType == EBVRHandleType::BVR_SpotLightHandle)
+		pComponent = NewObject<USpotLightHandleComponent>(Actor, FName("LightHandleComponent"));
+	else if (HandleType == EBVRHandleType::BVR_DirectionalLightHandle)
+		pComponent = NewObject<UDirectionalLightHandleComponent>(Actor, FName("LightHandleComponent"));
+	else if (HandleType == EBVRHandleType::BVR_ParticleHandle)
+		pComponent = NewObject<UParticleHandleComponent>(Actor, FName("ParticleHandleComponent"));
+
+	if (pComponent)
+	{
+		pComponent->AttachTo(Actor->GetRootComponent(), NAME_None, EAttachLocation::SnapToTarget, false);
+		pComponent->RegisterComponentWithWorld(GetWorld());
+		if (HandleType == EBVRHandleType::BVR_PointLightHandle || HandleType == EBVRHandleType::BVR_SpotLightHandle || HandleType == EBVRHandleType::BVR_DirectionalLightHandle)
+		{
+			Actor->SetActorHiddenInGame(false);
+		}
+		pComponent->SetHiddenInGame(false);
+		pComponent->SetVisibility(true);
+	}
+}
+
+void ABlockingVRManager::PastePIEParticle(AEmitter* Emitter, FVector Location) //private
+{
+	if (!Emitter) return;
+	FTransform T = Emitter->GetTransform();
+	T.SetLocation(Location);
+	AEmitter* PIEEmitter = Cast<AEmitter>(AddPIEParticle(Emitter->GetParticleSystemComponent()->Template, T));
+	if (PIEEmitter)
+	{
+		PIEEmitter->SetActorRotation(Emitter->GetActorRotation()); //rotation
+		PIEEmitter->SetActorScale3D(Emitter->GetActorScale3D()); //scale
+	}
+
 }
 
 #endif

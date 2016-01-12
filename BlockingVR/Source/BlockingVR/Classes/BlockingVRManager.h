@@ -5,18 +5,29 @@
 
 #include "BlockingVRManager.generated.h"
 
+class UActorHandleBase;
 class ULightHandleBase; 
 class UPointLightHandleComponent;
 class USpotLightHandleComponent;
 class UDirectionalLightHandleComponent;
-class USkyLightHandleComponent;
+//class USkyLightHandleComponent;
+class UParticleHandleComponent;
+
+UENUM(BlueprintType)		//HandleTypes
+enum class EBVRHandleType : uint8
+{
+	BVR_DirectionalLightHandle	UMETA(DisplayName = "DirectionalLightHandle"),
+	BVR_PointLightHandle 	UMETA(DisplayName = "PointLightHandle"),
+	BVR_SpotLightHandle 	UMETA(DisplayName = "SpotLightHandle"),
+	BVR_ParticleHandle		UMETA(DisplayName = "ParticleHandle")
+};
 
 UENUM(BlueprintType)		// required as using ELightComponent in SceneTypes.h was causing compile errors for some reason?.
 enum class EBVRLightType : uint8
 {
-	VBR_DirectionalLight	UMETA(DisplayName = "Directional"),
-	VBR_PointLight 	UMETA(DisplayName = "Point"),
-	VBR_SpotLight 	UMETA(DisplayName = "Spot")
+	BVR_DirectionalLight	UMETA(DisplayName = "Directional"),
+	BVR_PointLight 	UMETA(DisplayName = "Point"),
+	BVR_SpotLight 	UMETA(DisplayName = "Spot")
 };
 
 UCLASS()
@@ -26,6 +37,10 @@ class ABlockingVRManager : public AActor
 	virtual void BeginPlay() override;
 
 public:
+
+	/*New Lights that have been spawned in PIE and will be added to the editor upon Endplay()*/
+	UPROPERTY(BluePrintReadOnly, Category = "BlockingVR")
+		TArray<AEmitter*> NewEditorParticles;
 
 	/*New Lights that have been spawned in PIE and will be added to the editor upon Endplay()*/
 	UPROPERTY(BluePrintReadOnly, Category = "BlockingVR")
@@ -43,38 +58,49 @@ public:
 	UPROPERTY(BluePrintReadOnly, Category = "BlockingVR")
 		TArray<AActor*> ModifiedEditorActors;
 
-	/*Editor Actors/Lights that have been Deleted in PIE and will be Deleted in the editor upon Endplay()*/
+	/*Editor Actors/Lights/Particles that have been Deleted in PIE and will be Deleted in the editor upon Endplay()*/
 	UPROPERTY(BluePrintReadOnly, Category = "BlockingVR")
 		TArray<AActor*> DeletedEditorActors;
-	
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
+		void GetCollectionActorClasses(UPARAM(ref) TArray< TSubclassOf<AActor> > &ActorClassesArray);
+
+	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
+		void GetCollectionStaticMeshes(UPARAM(ref) TArray<UStaticMesh*> &StaticMeshReferenceArray);
+
+	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
+		void GetCollectionParticles(UPARAM(ref) TArray<UParticleSystem*> &ParticleSystemReferenceArray);
+
+	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
+		void GetCollectionSkeletalMeshes(UPARAM(ref) TArray<USkeletalMesh*> &SkeletalMeshReferenceArray);
+
 	/*Create UTexture from Thumbnail Data of ActorClass*/
-	/*Unfinished. currently only works for assets that have been saved.*/
 	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
 		UTexture2D* CreateActorThumbnailTexture(TSubclassOf<AActor> ActorIN);
 
 	/*Create UTexture from Thumbnail Data of StaticMesh*/
-	/*Unfinished. currently only works for assets that have been saved.*/
 	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
 		UTexture2D* CreateMeshThumbnailTexture(class UStaticMesh* MeshIN);
 
 	/*Create UTexture from Thumbnail Data of SkeletalMesh*/
-	/*Unfinished. currently only works for assets that have been saved.*/
 	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
 		UTexture2D* CreateSkeletalMeshThumbnailTexture(class USkeletalMesh* SMeshIN);
 
 	/*Create UTexture from Thumbnail Data of Material*/
-	/*Unfinished. currently only works for assets that have been saved.*/
 	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
 		UTexture2D* CreateMaterialThumbnailTexture(class UMaterial* MaterialIN);
 
 	/*Create UTexture from Thumbnail Data of ParticleSystem*/
-	/*Unfinished. currently only works for assets that have been saved.*/
 	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
 		UTexture2D* CreateParticleThumbnailTexture(class UParticleSystem* ParticleIN);
 
 	/*Apply's Deferred changes to Editor World and emptys Arrays*/
 	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
 		void ApplyDeferredChanges();
+
+	//Particles
+	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
+		AEmitter* AddPIEParticle(UParticleSystem* Template, FTransform T);
 
 	//Lights
 
@@ -128,7 +154,21 @@ public:
 
 
 	///////////////////////////////////////////////////////////////////////////////////
-	/*Pie Light Handles and debug meshes*/
+	/*Pie Actor Handles and debug meshes*/
+	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
+		void ShowAllPIEHandles();
+
+	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
+		void HideAllPIEHandles();
+
+	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
+		void SetPIEParticleHandleVisibility(AEmitter* Emitter, bool bVisible);
+
+	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
+		void ShowAllPIEParticleHandles();
+
+	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
+		void HideAllPIEParticleHandles();
 
 	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
 		void SetPIELightHandleVisibility(ALight* Light, bool bVisible);
@@ -173,7 +213,7 @@ public:
 		void SetLocationPIEActor(AActor* Actor, FVector Location, bool Snap = false, bool UseEditorSnapSize = false, float SnapSize = 1.0);
 
 	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
-		void SetRotationPIEActor(AActor* Actor, FRotator Rotation, bool Snap = false, bool UseEditorSnapSize = false, float SnapSize = 1.0);
+		void SetRotationPIEActor(AActor* Actor, FRotator Rotation, bool relative = false, bool Snap = false, bool UseEditorSnapSize = false, float SnapSize = 1.0);
 
 	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
 		void SetScalePIEActor(AActor* Actor, FVector Scale, bool Snap = false, bool UseEditorSnapSize = false, float SnapSize = 1.0);
@@ -184,6 +224,8 @@ public:
 		void DeletePIEActor(AActor* Actor);
 
 private:
+
+	void AttachHandle(AActor* Actor,EBVRHandleType HandleType);
 
 	UTexture2D* CreateThumbnailTexture(FName PackageName, FName ObjectPath = FName(""));
 	
@@ -200,6 +242,8 @@ private:
 	/* Adds The Actor to the editor world. */
 	void AddEditorActor(FTransform T, AActor* Actor);
 
+	void AddEditorParticle(FTransform T, AEmitter* Emitter);
+
 	/* Deletes the editor world actor if it already exists in the editor world. */
 	/* Used for all Actor Types. */
 	void DeleteEditorActor(AActor* Actor);
@@ -214,11 +258,13 @@ private:
 
 	void PastePIEDirectionalLight(ADirectionalLight* PointLight, FVector Location);
 
+	void PastePIEParticle(AEmitter* Emitter, FVector Location);
+
 	/*Adds the Light to the Editor world*/
 	ALight* AddEditorLight(FTransform T, EBVRLightType LightType);
 
-	/*Set properties shared by all light actors*/
-	void SetCommonEditorLightProperties(ALight* EditorLight, const ALight* PIELight);
+	/*Copy properties shared by all light actors*/
+	void CopyCommonLightProperties(ALight* ToLight, const ALight* FromLight);
 
 	/* Update Arrays*/
 
