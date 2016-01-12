@@ -11,6 +11,8 @@
 
 #include "LevelEditor.h"
 
+DEFINE_LOG_CATEGORY(BlockingVR_Log);
+
 static const FName BlockingVRTabName("BlockingVR");
 
 #define LOCTEXT_NAMESPACE "FBlockingVRModule"
@@ -50,6 +52,14 @@ void FBlockingVRModule::StartupModule()
 	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(BlockingVRTabName, FOnSpawnTab::CreateRaw(this, &FBlockingVRModule::OnSpawnPluginTab))
 		.SetDisplayName(LOCTEXT("FBlockingVRTabTitle", "BlockingVR"))
 		.SetMenuType(ETabSpawnerMenuType::Hidden);
+
+	FCollectionManagerModule& CollectionManagerModule = FCollectionManagerModule::GetModule();
+	ICollectionManager& CollectionManager = CollectionManagerModule.Get();
+
+	if (!CollectionManager.CollectionExists(FName("BlockingVRCollection"), ECollectionShareType::CST_Local))
+	{
+		CollectionManager.CreateCollection(FName("BlockingVRCollection"), ECollectionShareType::CST_Local, ECollectionStorageMode::Static);
+	}
 }
 
 void FBlockingVRModule::ShutdownModule()
@@ -70,16 +80,6 @@ TSharedRef<SDockTab> FBlockingVRModule::OnSpawnPluginTab(const FSpawnTabArgs& Sp
 		FText::FromString(TEXT("FBlockingVRModule::OnSpawnPluginTab")),
 		FText::FromString(TEXT("BlockingVR.cpp"))
 		);
-	//TArray<class UStaticMesh*> MeshArray;
-	TSharedPtr<class IDetailsView> PropertyView;
-
-	// Create a property view
-	FPropertyEditorModule& EditModule = FModuleManager::Get().GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
-
-	FDetailsViewArgs DetailsViewArgs( /*bUpdateFromSelection=*/ false, /*bLockable=*/ false, /*bAllowSearch=*/ false, FDetailsViewArgs::HideNameArea, /*bHideSelectionTip=*/ true);
-	DetailsViewArgs.bShowOptions = false;
-
-	PropertyView = EditModule.CreateDetailView(DetailsViewArgs);
 	
 	return SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
@@ -91,9 +91,6 @@ TSharedRef<SDockTab> FBlockingVRModule::OnSpawnPluginTab(const FSpawnTabArgs& Sp
 			[
 				SNew(STextBlock)
 				.Text(WidgetText)
-			]
-			[ 
-				SNew(SComboBox<class UStaticMesh*>)
 			]
 		];
 }

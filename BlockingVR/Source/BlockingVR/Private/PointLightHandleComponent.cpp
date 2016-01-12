@@ -15,6 +15,9 @@ UPointLightHandleComponent::UPointLightHandleComponent(const FObjectInitializer&
 
 void UPointLightHandleComponent::DrawDebugMeshes(void)
 {
+	//USceneComponent::GetComponentLocation()
+
+	//T.ToMatrixNoScale()
 	APointLight* Light = Cast<APointLight>(GetOwner());
 	if (Light)
 	{

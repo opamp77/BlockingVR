@@ -1,6 +1,5 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 #if WITH_EDITORONLY_DATA
-
 #include "SlateBasics.h"
 #include "Actor.h"
 #include "StaticMeshActor.h"
@@ -11,7 +10,8 @@
 #include "SpotLight.h"
 #include "SpotlightComponent.h"
 #include "DirectionalLight.h"
-#include "SkyLight.h"
+//#include "SkyLight.h"
+#include "Emitter.h"
 #include "BlockingVolume.h"
 #include "Brush.h"
 #include "ObjectTools.h"
@@ -21,6 +21,8 @@
 #include "AssetRegistryModule.h"
 #include "IDetailsView.h"
 #include "PropertyEditorModule.h"
+//#include "PropertyCustomizationHelpers.h"
+#include "CollectionManagerModule.h"
 
 #include "BlockingVR.h"
 
