@@ -250,6 +250,8 @@ private:
 
 	void DeletePIELight(ALight* Light);
 
+	void DeletePIEEmitter(AEmitter* Emitter);
+
 	void PastePIELight(ALight* Light, FVector Location);
 
 	void PastePIEPointLight(APointLight* PointLight, FVector Location);
