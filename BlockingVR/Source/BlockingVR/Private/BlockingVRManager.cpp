@@ -479,6 +479,32 @@ bool ABlockingVRManager::PIESetStaticMesh(UStaticMeshComponent* StaticMeshCompon
 	return result;
 }
 
+AStaticMeshActor* ABlockingVRManager::AddPIEStaticMesh(UStaticMesh* Mesh, FTransform T)
+{
+	if (!Mesh) return nullptr;
+
+	AStaticMeshActor* PIEStaticMeshActor = nullptr;
+	AActor* PIEActor = AddPIEActor(AStaticMeshActor::StaticClass(), T);
+
+	if (PIEActor) PIEStaticMeshActor = Cast<AStaticMeshActor>(PIEActor);
+	else return nullptr;
+
+	if (PIEStaticMeshActor)
+	{
+		bool bStaticMeshSet = PIESetStaticMesh(PIEStaticMeshActor->GetStaticMeshComponent(), Mesh);
+		if (!bStaticMeshSet)
+		{
+			DeletePIEActor(PIEActor);
+			return nullptr;
+		}
+		else
+		{
+			return PIEStaticMeshActor;
+		}
+	}
+	else return nullptr;
+}
+
 AEmitter* ABlockingVRManager::AddPIEParticle(UParticleSystem* Template, FTransform T)
 {
 	if (!Template) return nullptr;
