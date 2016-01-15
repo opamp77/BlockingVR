@@ -762,6 +762,12 @@ void ABlockingVRManager::DeletePIEActor(AActor* Actor)
 		DeletePIELight(Light);
 		return;
 	}
+	AEmitter* Emitter = Cast<AEmitter>(Actor);
+	if (Emitter)
+	{
+		DeletePIEEmitter(Emitter);
+		return;
+	}
 	//Check to see if this is a new Actor
 	bool bIsNewActor = false;
 	for (int32 i = 0; i < NewEditorActors.Num(); i++)
@@ -1206,6 +1212,34 @@ ALight* ABlockingVRManager::AddEditorLight(FTransform T, EBVRLightType LightType
 	if (!Result) UE_LOG(BlockingVR_Log, Error, TEXT("ABlockingVRManager::AddEditorLight() Failed!"));
 	return Result;
 
+}
+
+void ABlockingVRManager::DeletePIEEmitter(AEmitter* Emitter)
+{
+	bool bIsNewEmitter = false;
+	for (int32 i = 0; i < NewEditorParticles.Num(); i++)
+	{
+		if (NewEditorParticles[i] == Emitter)
+		{
+			bIsNewEmitter = true;
+			NewEditorParticles.RemoveAt(i); //remove from deferred additions Array;
+			break;
+		}
+	} //end for
+	if (bIsNewEmitter == false)
+	{
+		for (int32 i = 0; i < ModifiedEditorActors.Num(); i++) //remove from modiefied list if in there
+		{
+			if (ModifiedEditorActors[i] == StaticCast<AActor*>(Emitter)) //fixes previous crash bug
+			{
+				ModifiedEditorActors.RemoveAt(i);
+				break;
+			}
+		}
+		//try and find the editor version for destruction then destroy the PIE verson
+		DeleteEditorActor(Emitter);
+	}
+	Emitter->Destroy();
 }
 
 void ABlockingVRManager::DeletePIELight(ALight* Light) //private
