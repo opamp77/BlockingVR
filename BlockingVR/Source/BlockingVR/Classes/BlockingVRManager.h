@@ -194,6 +194,9 @@ public:
 	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
 		bool PIESetStaticMesh(UStaticMeshComponent* StaticMeshComponent, UStaticMesh* Mesh);
 
+	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
+		AStaticMeshActor* AddPIEStaticMesh(UStaticMesh* Mesh, FTransform T);
+
 	/* Use for special cases of spawning an actor which will be duplicated in the editor world */
 	/* upon ApplyDeferredChanges(). Normally PastePIEActor() should be used which calls this. */
 	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
