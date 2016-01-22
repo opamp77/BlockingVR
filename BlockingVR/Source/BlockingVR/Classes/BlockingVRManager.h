@@ -1,5 +1,5 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
-//#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 
 #pragma once
 
@@ -62,6 +62,7 @@ public:
 	UPROPERTY(BluePrintReadOnly, Category = "BlockingVR")
 		TArray<AActor*> DeletedEditorActors;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
 		void GetCollectionActorClasses(UPARAM(ref) TArray< TSubclassOf<AActor> > &ActorClassesArray);
 
@@ -72,7 +73,10 @@ public:
 		void GetCollectionParticles(UPARAM(ref) TArray<UParticleSystem*> &ParticleSystemReferenceArray);
 
 	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
-		void GetCollectionSkeletalMeshes(UPARAM(ref) TArray<USkeletalMesh*> &SkeletalMeshReferenceArray);
+		void GetCollectionMaterials(UPARAM(ref) TArray<UMaterialInterface*> &MaterialReferenceArray);
+
+	//UFUNCTION(BlueprintCallable, Category = "BlockingVR")
+	//	void GetCollectionSkeletalMeshes(UPARAM(ref) TArray<USkeletalMesh*> &SkeletalMeshReferenceArray);
 
 	/*Create UTexture from Thumbnail Data of ActorClass*/
 	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
@@ -83,8 +87,8 @@ public:
 		UTexture2D* CreateMeshThumbnailTexture(class UStaticMesh* MeshIN);
 
 	/*Create UTexture from Thumbnail Data of SkeletalMesh*/
-	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
-		UTexture2D* CreateSkeletalMeshThumbnailTexture(class USkeletalMesh* SMeshIN);
+	//UFUNCTION(BlueprintCallable, Category = "BlockingVR")
+	//	UTexture2D* CreateSkeletalMeshThumbnailTexture(class USkeletalMesh* SMeshIN);
 
 	/*Create UTexture from Thumbnail Data of Material*/
 	UFUNCTION(BlueprintCallable, Category = "BlockingVR")
@@ -197,6 +201,9 @@ public:
 	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
 		AStaticMeshActor* AddPIEStaticMesh(UStaticMesh* Mesh, FTransform T);
 
+	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
+		void PIESetMaterial(UStaticMeshComponent* StaticMeshComponent, UMaterial* Material, uint8 Index = 0);
+
 	/* Use for special cases of spawning an actor which will be duplicated in the editor world */
 	/* upon ApplyDeferredChanges(). Normally PastePIEActor() should be used which calls this. */
 	UFUNCTION(BluePrintCallable, Category = "BlockingVR")
@@ -227,6 +234,8 @@ public:
 		void DeletePIEActor(AActor* Actor);
 
 private:
+
+	void CopyStaticMeshActorMaterials(AStaticMeshActor* FromActor, AStaticMeshActor* ToActor);
 
 	void AttachHandle(AActor* Actor,EBVRHandleType HandleType);
 
@@ -268,8 +277,13 @@ private:
 	/*Adds the Light to the Editor world*/
 	ALight* AddEditorLight(FTransform T, EBVRLightType LightType);
 
-	/*Copy properties shared by all light actors*/
-	void CopyCommonLightProperties(ALight* ToLight, const ALight* FromLight);
+	/*Copy properties shared by all light actors(Including Transform. Excluding Mobility)*/
+	void CopyCommonLightProperties(const ALight* FromLight, ALight* ToLight);
+
+	/*Copy properties shared by all pointlights*/
+	void CopyPointLightSpecificProperties(APointLight* FromLight, APointLight* ToLight);
+
+	void CopySpotLightSpecificProperties(ASpotLight* FromLight , ASpotLight* ToLight);
 
 	/* Update Arrays*/
 
@@ -277,6 +291,11 @@ private:
 
 	void NotifyModifiedLight(ALight* Light);
 
+	/*Moves an actor regardless of current mobility*/
+	/*but does mot invalidate lighting cache*/
+	void MoveActor(AActor* Actor, FVector Location);
 
 };
+
+#endif
 

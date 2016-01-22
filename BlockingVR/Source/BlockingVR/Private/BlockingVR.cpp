@@ -1,5 +1,5 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
-#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 
 #include "BlockingVRPrivatePCH.h"
 
@@ -34,7 +34,6 @@ void FBlockingVRModule::StartupModule()
 		FCanExecuteAction());
 		
 	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
-	
 	{
 		TSharedPtr<FExtender> MenuExtender = MakeShareable(new FExtender());
 		MenuExtender->AddMenuExtension("WindowLayout", EExtensionHook::After, PluginCommands, FMenuExtensionDelegate::CreateRaw(this, &FBlockingVRModule::AddMenuExtension));

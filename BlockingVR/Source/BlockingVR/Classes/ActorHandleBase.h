@@ -1,11 +1,11 @@
 // Copyright 1998 - 2015 Epic Games, Inc.All Rights Reserved.
-#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 
 #pragma once
 
 #include "ActorHandleBase.generated.h"
 
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS()
 class UActorHandleBase : public UStaticMeshComponent
 {
 	GENERATED_UCLASS_BODY()

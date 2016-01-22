@@ -1,5 +1,5 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
-#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 
 #include "BlockingVRPrivatePCH.h"
 #include "PointLightHandleComponent.h"
@@ -15,9 +15,6 @@ UPointLightHandleComponent::UPointLightHandleComponent(const FObjectInitializer&
 
 void UPointLightHandleComponent::DrawDebugMeshes(void)
 {
-	//USceneComponent::GetComponentLocation()
-	
-	//T.ToMatrixNoScale()
 	APointLight* Light = Cast<APointLight>(GetOwner());
 	if (Light)
 	{

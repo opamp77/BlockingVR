@@ -1,4 +1,4 @@
-#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 
 #include "BlockingVRPrivatePCH.h"
 #include "DirectionalLightHandleComponent.h"
