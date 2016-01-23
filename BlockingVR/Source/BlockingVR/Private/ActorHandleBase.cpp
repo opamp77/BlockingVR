@@ -1,5 +1,5 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
-#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 
 #include "BlockingVRPrivatePCH.h"
 #include "ActorHandleBase.h"
@@ -20,10 +20,8 @@ UActorHandleBase::UActorHandleBase(const FObjectInitializer& ObjectInitializer)
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = false;
 	StartingScale = FVector(0.001, 0.001, 0.001);
-	//SetWorldScale3D(StartingScale);
-	//ECollisionChannel::ECC_WorldDynamic
 
-	//MaterialInstanceConstant'/BlockingVR/Menus/Materials/PointLightIcon.PointLightIcon' in subclasses
+	//MaterialInstanceConstant'/BlockingVR/Menus/Materials/SomeMatherial.SomeMaterial' in subclasses
 }
 
 void UActorHandleBase::DrawDebugMeshes(void) //virtual base
@@ -49,6 +47,7 @@ FVector UActorHandleBase::GetHMDWorldLocation(void)
 void UActorHandleBase::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
 	if (bShouldRender)
 	{		//Orient towards the player
 		FVector HMDWorldPosition = GetHMDWorldLocation();

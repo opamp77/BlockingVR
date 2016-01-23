@@ -1,5 +1,5 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
-#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 #include "SlateBasics.h"
 #include "Actor.h"
 #include "StaticMeshActor.h"
@@ -19,10 +19,8 @@
 #include "IHeadMountedDisplay.h"
 #include "DrawDebugHelpers.h"
 #include "AssetRegistryModule.h"
-#include "IDetailsView.h"
-#include "PropertyEditorModule.h"
-//#include "PropertyCustomizationHelpers.h"
 #include "CollectionManagerModule.h"
+#include "Transactor.h" //test
 
 #include "BlockingVR.h"
 
