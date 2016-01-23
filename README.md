@@ -138,8 +138,14 @@ And then start VR preview. To disable simply switch your gamemode back.
 ####Particles Menu
 ![](http://imgur.com/JxJI3cj.jpg)<br>
 * Available when no actor is selected.
-* Only visible if at least one particle systm has been added to the "BlockingVRCollection" collection.
+* Only visible if at least one particle system has been added to the "BlockingVRCollection" collection.
 * Spawn the highlighted particle system at current cursor location with **A Button**
+
+####Materials Menu
+![](http://imgur.com/yR6x2Ho.jpg)<br>
+* Available when no actor is selected.
+* Only visible if at least one material has been added to the "BlockingVRCollection" collection.
+* Attempt to apply the highlighted material to the currently highlighted StaticMeshActor with **A Button**
 
 ## Creating your own interface
 TBC...
