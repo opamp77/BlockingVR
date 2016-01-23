@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
-	"Version": 1,
-	"VersionName": "Beta",
+	"Version": 2,
+	"VersionName": "Beta2",
 	"FriendlyName": "BlockingVR",
 	"Description": "Basic VR Level Editing Interface",
 	"Category": "Virtual Reality",
