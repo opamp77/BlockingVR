@@ -152,4 +152,157 @@ And then start VR preview. To disable simply switch your gamemode back.
 * Attempt to apply the highlighted material to the currently highlighted StaticMeshActor with **A Button**
 
 ## Creating your own interface
-TBC...
+BlockingVR is essentially a collection of blueprint node's which can be used with whatever form of user input you wish to use.<br>
+
+In the BVRExamplePawn A "BlockingVRManager" is spawned at beginplay and all API calls are done though this manager;
+All changes are deferred in the editor until ApplyDeferredChanges() is called.
+
+Below is a list of blueprint nodes most of which where used in BVRExamplePawn (Which can be found in "BlockingVR Content/Example").<br>
+
+####User Interface:
+
+#####CreateActorThumbnailTexture
+![](http://i.imgur.com/J3TfmhK.jpg)<br>
+* Attempts to create a thumbnail for the given actor class.
+* Returns NULL if failed.
+
+#####CreateMeshThumbnailTexture
+![](http://i.imgur.com/W9wtud8.jpg)<br>
+* Attempts to create a thumbnail for the given static mesh.
+* Returns NULL if failed.
+
+#####CreateParticleThumbnailTexture
+![](http://i.imgur.com/j3t4Cky.jpg)<br>
+* Attempts to create a thumbnail for the given particle system.
+* Returns NULL if failed.
+
+#####CreateMaterialThumbnailTexture
+![](http://i.imgur.com/jS5fr4U.jpg)<br>
+* Attempts to create a thumbnail for the given material.
+* Returns NULL if failed.
+
+#####Collection Node's
+![](http://i.imgur.com/dV1x6eu.jpg)<br>
+* Populates a TArray with a list of asset's of type currently in the "BlockingVRCollection".
+
+####Creation, Deletion, Modification:
+
+#####ApplyDeferredChanges
+![](http://i.imgur.com/1dK6AFs.jpg)<br>
+* Should be called to apply the currently made changes to the editor world.
+
+#####AddPIEActor
+![](http://i.imgur.com/wiAuXm8.jpg)<br>
+* Adds an Actor with the specific transform.
+* **Note:** Actor's should have some form of collision to be modifiable.
+* **Note:** You should use AddPIELight(), AddPIEParticle() and AddPIEStaticMesh() for there respective types.
+
+#####AddPIELight
+![](http://i.imgur.com/D2bqRPt.jpg)<br>
+* Adds an Light at the specific location.
+* All new lights default to stationary mobility.
+
+#####AddPIEParticle
+![](http://i.imgur.com/YIBGaUV.jpg)<br>
+* Adds a particle with the specific transform.
+
+#####AddPIEStaticMesh
+![](http://i.imgur.com/GOevcXR.jpg)<br>
+* Adds a static mesh with the specific transform.
+* **Note:** Meshes should have some form of collision to be modifiable.
+
+#####DeletePIEActor
+![](http://i.imgur.com/VJlBCTl.jpg)<br>
+* Use for deleting an actor regardless of type.
+
+#####PastePIEActor
+![](http://i.imgur.com/kwPLZP8.jpg)<br>
+* Creates a copy of the actor at the specific location using the original actors scale and rotation.
+* If the actor is a light then basic light properties will also be copied.
+* If the actor is a static mesh actor then the mesh along with materials will also be copied.
+
+#####SetTransformPIEActor
+![](http://i.imgur.com/brlHnh6.jpg)<br>
+* Set new transform for the actor.
+
+#####SetLocationPIEActor
+![](http://i.imgur.com/KiXO6ah.jpg)<br>
+* Set new location for the actor.
+* With the option to snap the vector uniformly to the given snap size.
+
+#####SetRotationPIEActor
+![](http://i.imgur.com/IeWJ6Rq.jpg)<br>
+* Set new rotation for the actor.
+* With the option to snap the rotator uniformly to the given snap size.
+
+#####SetScalePIEActor
+![](http://i.imgur.com/cTXJVqo.jpg)<br>
+* Set new scale for the actor.
+* With the option to snap the vector uniformly to the given snap size.
+
+#####PIESetMaterial
+![](http://i.imgur.com/YdSaQIx.jpg)<br>
+* Attempts to set the material of a StaticMeshActor.
+
+####Lighting:
+
+#####GetPIEPointLightRadius
+![](http://i.imgur.com/Te2G9IO.jpg)<br>
+* Gets the current radius of a point light (required as this is not normally availible via blueprint).
+
+#####GetPIESpotLightRadius
+![](http://i.imgur.com/MJUyljF.jpg)<br>
+* Gets the current radius of a spot light (required as this is not normally availible via blueprint).
+
+#####SetPIELightColor
+![](http://i.imgur.com/D5g2xAr.jpg)<br>
+* Set's the linear color of a light.
+
+#####SetPIELightIntensity
+![](http://i.imgur.com/vpohyFV.jpg)<br>
+* Set's the intensity of a light.
+
+#####SetPIELightStaticShadows
+![](http://i.imgur.com/eSuj4pZ.jpg)<br>
+* Enable or disable static shadows for a light.
+
+#####SetPIELightDynamicShadows
+![](http://i.imgur.com/Y2XpSwX.jpg)<br>
+* Enable or disable dynamic shadows for a light.
+* Just as with the standard editor you may not immediately see any change until a light rebuild has occurred depending on the lights mobility.
+
+#####SetPIELightSquareFalloff
+![](http://i.imgur.com/pZdGCyw.jpg)<br>
+* Enable or disable square falloff for a light.
+
+#####SetPIELightTranslucentLighting
+![](http://i.imgur.com/4bu1nbS.jpg)<br>
+* Enable or disable translucent lighting for a light.
+
+#####SetPIEPointLightRadius
+![](http://i.imgur.com/NCAzvOF.jpg)<br>
+* Sets the radius for a point light.
+
+#####SetPIESpotLightRadius
+![](http://i.imgur.com/YdHguw0.jpg)<br>
+* Sets the radius for a spot light.
+
+#####SetPIESpotLightOuterCone
+![](http://i.imgur.com/9xcLVnW.jpg)<br>
+* Sets the outer cone angle for a spot light.
+
+#####SetPIESpotLightInnerCone
+![](http://i.imgur.com/rExz3ec.jpg)<br>
+* Sets the inner cone angle for a spot light.
+
+
+
+
+
+
+
+
+
+
+
+
