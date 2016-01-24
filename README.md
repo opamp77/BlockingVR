@@ -13,7 +13,11 @@ called BVRExamplePawn.
 
 ## Installation & setup
 
-The contents of this plugin should be copied to your UE4 installation location.<br>
+If you are not compiling UE4's engine from source you should download one of the latest precompilied windows binaries:<br>
+* [engine version 4.9.2](http://www.mediafire.com/download/73yup04cv7a11zj/BlockingVR4.9Beta2-Binary.rar)<br>
+* [engine version 4.10.2](http://www.mediafire.com/download/is2hqqt3517shvj/BlockingVR4.10Beta2-Binary.rar)
+
+The contents of the plugin should be copied to your UE4 installation location.<br>
 so that the BlockingVR folder resides in the engines plugin folder.<br>
 i.e C:\UE4\Engine\Plugins\BlockingVR<br>
 Once copied over the plugin will need enabling and the engine restarting<br>
