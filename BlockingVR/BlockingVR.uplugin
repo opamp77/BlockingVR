@@ -14,7 +14,7 @@
 	"Modules": [
 		{
 			"Name": "BlockingVR",
-			"Type": "Editor",
+			"Type": "EditorNoCommandlet",
 			"LoadingPhase": "PostDefault"
 		}
 	],
